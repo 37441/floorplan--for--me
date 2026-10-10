@@ -1446,19 +1446,29 @@ $('#clearAll').onclick = clearLayout;
 
 /* 全屏：标准 API + Safari（iPad）的 webkit 前缀版本 */
 const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+let fsOn = false; // WebView 内 element.fullscreen 可能不生效，用自身状态保证按钮/方向切换可控
+function notifyFullscreen(on){
+  try{ if(window.flutter_inappwebview) window.flutter_inappwebview.callHandler('fullscreenState', !!on); }catch(e){}
+}
 function toggleFullscreen(){
   const de = document.documentElement;
-  if (fsEl()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-  else {
+  if (fsEl() || fsOn){
+    fsOn = false;
+    (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  } else {
+    fsOn = true;
     const req = de.requestFullscreen || de.webkitRequestFullscreen;
     if (!req) return toast(tr('当前浏览器不支持网页全屏，可在 Safari 中「添加到主屏幕」后以全屏方式打开', 'Fullscreen is not supported here — in Safari, use "Add to Home Screen" to open it fullscreen'));
     Promise.resolve(req.call(de)).catch(() => toast(tr('无法进入全屏', 'Could not enter fullscreen')));
   }
+  notifyFullscreen(fsOn);
+  syncFullscreen();
 }
 function syncFullscreen(){
-  const on = !!fsEl(), b = $('#fullscreen');
+  const on = !!fsEl() || fsOn, b = $('#fullscreen');
   b.textContent = '⛶ ' + (on ? tr('退出全屏', 'Exit fullscreen') : tr('全屏', 'Fullscreen'));
   b.title = (on ? tr('退出全屏', 'Exit fullscreen') : tr('全屏', 'Fullscreen')) + ' (Shift+F)';
+  notifyFullscreen(on);
 }
 $('#fullscreen').onclick = toggleFullscreen;
 ['fullscreenchange', 'webkitfullscreenchange'].forEach(t => document.addEventListener(t, syncFullscreen));
