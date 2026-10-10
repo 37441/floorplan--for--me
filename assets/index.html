@@ -22,7 +22,7 @@ button,input,select{font:inherit;color:inherit}
   padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input{-webkit-user-select:text;user-select:text}
-header{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:8px 14px;
+header{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:6px 10px;
   background:var(--panel);border-bottom:1px solid var(--line)}
 .brand{display:flex;flex-direction:column;margin-right:8px;line-height:1.25}
 .brand b{font-size:15px;letter-spacing:.5px}
@@ -224,11 +224,6 @@ main.drawer-panel #fab{opacity:0;visibility:hidden}
 <body>
 <div class="app">
   <header>
-    <div class="grp" id="paneBtns">
-      <button class="btn chip" id="tgLib" data-en="◧ Library">◧ 家具库</button>
-      <button class="btn chip" id="tgPanel" data-en="Properties ◨">属性 ◨</button>
-    </div>
-    <div class="brand"><b data-en="3BR 2LR 2BA · Interior Design">三室两厅两卫 · 装修设计</b><span id="subtitle">原始户型 1:60 · 尺寸单位 mm</span></div>
     <div class="grp seg" id="viewSeg" title="切换 2D / 3D (T)" data-en-title="Switch 2D / 3D (T)">
       <span class="pill"></span>
       <button class="btn" data-view="2d" data-en="2D Plan">2D 平面</button>
@@ -239,6 +234,11 @@ main.drawer-panel #fab{opacity:0;visibility:hidden}
       <button class="btn" data-tool="measure" title="测量 (M)" data-en-title="Measure (M)" data-en="Measure">测量</button>
       <button class="btn" data-tool="demolish" title="拆改非承重墙 (X)" data-en-title="Demolish non-bearing walls (X)" data-en="Demolish">拆改墙体</button>
     </div>
+    <div class="grp">
+      <button class="btn" id="undo" title="撤销 (Ctrl+Z)" data-en-title="Undo (Ctrl+Z)" data-en="Undo">撤销</button>
+      <button class="btn" id="redo" title="重做 (Ctrl+Shift+Z)" data-en-title="Redo (Ctrl+Shift+Z)" data-en="Redo">重做</button>
+      <button class="btn danger" id="clearAll" title="清空所有家具家电（可撤销）" data-en-title="Remove all furniture and appliances (undoable)" data-en="Clear">清空布置</button>
+    </div>
     <div class="grp only2d">
       <button class="btn" id="zoomOut" title="缩小" data-en-title="Zoom out">−</button>
       <button class="btn" id="zoomIn" title="放大" data-en-title="Zoom in">＋</button>
@@ -246,6 +246,26 @@ main.drawer-panel #fab{opacity:0;visibility:hidden}
       <button class="btn" id="s60" title="按 1:60 显示（与原图同比例）" data-en-title="Show at 1:60 (same scale as the original plan)">1:60</button>
       <button class="btn" id="s100" title="按 1:100 显示" data-en-title="Show at 1:100">1:100</button>
     </div>
+    <div class="grp" id="langSel" role="group" aria-label="Language / 语言">
+      <button class="btn chip" data-lang="zh" title="简体中文">简</button>
+      <button class="btn chip" data-lang="zht" title="繁體中文">繁</button>
+      <button class="btn chip" data-lang="en" title="English">EN</button>
+    </div>
+    <button class="btn" id="fullscreen" title="全屏 (Shift+F)" style="border:1px solid var(--line);background:#fff">⛶ 全屏</button>
+    <details class="menu"><summary class="btn" data-en="File ▾">文件 ▾</summary>
+      <div class="menu-pop">
+        <button class="btn" id="exportPng" data-en="Export image">导出图片</button>
+        <button class="btn" id="exportJson" data-en="Export plan JSON">导出方案 JSON</button>
+        <button class="btn" id="importJson" data-en="Import plan">导入方案</button>
+        <button class="btn" id="importImg" data-en="Import image & auto-detect">导入图片自动识别</button>
+        <button class="btn danger" id="reset" data-en="Reset to default">重置为默认方案</button>
+      </div></details>
+    <div class="grp" id="paneBtns">
+      <button class="btn chip" id="tgLib" data-en="◧ Library">◧ 家具库</button>
+      <button class="btn chip" id="tgPanel" data-en="Properties ◨">属性 ◨</button>
+    </div>
+    <input type="file" id="fileIn" accept=".json,application/json,image/*" hidden>
+    <div class="brand"><b data-en="3BR 2LR 2BA · Interior Design">三室两厅两卫 · 装修设计</b><span id="subtitle">原始户型 1:60 · 尺寸单位 mm</span></div>
     <div class="grp only3d" id="modes3d">
       <button class="btn on" data-mode="orbit" data-en="Orbit">鸟瞰</button>
       <button class="btn" data-mode="walk" data-en="Walk">漫游</button>
@@ -253,11 +273,6 @@ main.drawer-panel #fab{opacity:0;visibility:hidden}
     <div class="grp only3d">
       <button class="btn" id="vIso" data-en="Iso">斜视</button>
       <button class="btn" id="vTop" data-en="Top">俯视</button>
-    </div>
-    <div class="grp">
-      <button class="btn" id="undo" title="撤销 (Ctrl+Z)" data-en-title="Undo (Ctrl+Z)" data-en="Undo">撤销</button>
-      <button class="btn" id="redo" title="重做 (Ctrl+Shift+Z)" data-en-title="Redo (Ctrl+Shift+Z)" data-en="Redo">重做</button>
-      <button class="btn danger" id="clearAll" title="清空所有家具家电（可撤销）" data-en-title="Remove all furniture and appliances (undoable)" data-en="Clear">清空布置</button>
     </div>
     <div class="grp only2d" id="layers">
       <button class="btn chip on" data-layer="dims" data-en="Dims">尺寸</button>
@@ -277,21 +292,6 @@ main.drawer-panel #fab{opacity:0;visibility:hidden}
       <button class="btn chip" data-t="night" data-en="Night">夜景</button>
     </div>
     <div class="grp only3d"><label class="range"><span data-en="Sun">日照</span> <input type="range" id="sun" min="7" max="18" step=".25" value="10" style="width:84px"><span id="sunT">10:00</span></label></div>
-    <div class="spacer"></div>
-    <div class="grp" id="langSel" role="group" aria-label="Language / 语言">
-      <button class="btn chip" data-lang="zh" title="简体中文">简</button>
-      <button class="btn chip" data-lang="zht" title="繁體中文">繁</button>
-      <button class="btn chip" data-lang="en" title="English">EN</button>
-    </div>
-    <button class="btn" id="fullscreen" title="全屏 (Shift+F)" style="border:1px solid var(--line);background:#fff">⛶ 全屏</button>
-    <details class="menu"><summary class="btn" data-en="File ▾">文件 ▾</summary>
-      <div class="menu-pop">
-        <button class="btn" id="exportPng" data-en="Export image">导出图片</button>
-        <button class="btn" id="exportJson" data-en="Export plan JSON">导出方案 JSON</button>
-        <button class="btn" id="importJson" data-en="Import plan">导入方案</button>
-        <button class="btn danger" id="reset" data-en="Reset to default">重置为默认方案</button>
-      </div></details>
-    <input type="file" id="fileIn" accept=".json,application/json" hidden>
   </header>
 
   <aside class="lib">
@@ -457,6 +457,24 @@ const ROOMS = [
   {id:'bay1', name:'主卧飘窗', poly:[[10270,800],[10510,800],[10510,760],[11030,760],[11030,2650],[10510,2650],[10510,2600],[10270,2600]], mat:'marble', counted:false},
   {id:'bay2', name:'子女房飘窗', poly:[[10270,4260],[10510,4260],[10510,4210],[11030,4210],[11030,5785],[10510,5785],[10510,5740],[10270,5740]], mat:'marble', counted:false},
 ];
+/* ============ 导入户型模板（图片识别结果）支持 ============ */
+const STORE_PLAN = 'huxing-imported-plan-v1';
+// 启动时先快照默认模板（在 importedPlan 应用之前），供「重置为默认方案」恢复。
+const DEFAULT_PLAN = {walls:WALLS.slice(), wins:WINS.slice(), doors:DOORS.slice(), slides:SLIDES.slice(), rooms:ROOMS.slice()};
+function applyPlan(p){
+  WALLS.splice(0, WALLS.length, ...(p.walls||[]));
+  WINS.splice(0, WINS.length, ...(p.wins||[]));
+  DOORS.splice(0, DOORS.length, ...(p.doors||[]));
+  SLIDES.splice(0, SLIDES.length, ...(p.slides||[]));
+  ROOMS.splice(0, ROOMS.length, ...(p.rooms||[]));
+  // 让视图范围跟随新模板（fitView / 导出共用 BOUNDS 引用）
+  const xs=[], ys=[]; ROOMS.forEach(r => (r.poly||[]).forEach(pt => { xs.push(pt[0]); ys.push(pt[1]); }));
+  if (xs.length){
+    const pad = 1200;
+    const x0 = Math.min(...xs)-pad, y0 = Math.min(...ys)-pad, x1 = Math.max(...xs)+pad, y1 = Math.max(...ys)+pad;
+    BOUNDS.x = x0; BOUNDS.y = y0; BOUNDS.w = x1-x0; BOUNDS.h = y1-y0;
+  }
+}
 const MATS = {
   wood:    {name:'橡木地板', price:320, sw:'#d8b88a'},
   walnut:  {name:'胡桃木地板', price:380, sw:'#9b7250'},
@@ -564,6 +582,8 @@ const svg = $('#plan');
 
 /* ======================= 状态 / 历史 / 存储 ======================= */
 let state = load() || defaultState();
+// 恢复上次导入图片生成的户型模板（如有）
+try { const _p = JSON.parse(localStorage.getItem(STORE_PLAN)); if (_p && Array.isArray(_p.walls) && _p.walls.length) applyPlan(_p); } catch(e) {}
 const ui = {tool:'select', sel:null, mA:null, mCur:null,
   layers:{dims:true, labels:true, furn:true, grid:false, bearing:false, wallSnap:true}};
 let view = {x0:0, y0:0, s:.06};
@@ -1386,6 +1406,28 @@ addEventListener('pointercancel', e => endLibDrag(e, false));
 
 /* ======================= 导入导出 ======================= */
 function download(name, blob){ const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); }
+function isApp(){ return !!(window.flutter_inappwebview && window.flutter_inappwebview.callHandler); }
+function strToB64(s){ return btoa(unescape(encodeURIComponent(s))); }
+// WebView 内浏览器下载不可用，改为分块交给 Flutter 原生保存（Binder 单次调用有 1MB 上限）
+function saveViaApp(name, mime, b64, cb){
+  if (!isApp()) return false;
+  const CH = 240000, total = Math.max(1, Math.ceil(b64.length / CH));
+  let idx = 0;
+  function next(){
+    window.flutter_inappwebview.callHandler('saveChunk', {name:name, mime:mime, total:total, index:idx, data:b64.slice(idx*CH, (idx+1)*CH)})
+      .then(r => { if (r && r.path) cb(r.path); else if (idx < total-1) { idx++; next(); } else cb(null); })
+      .catch(() => cb(null));
+  }
+  next();
+  return true;
+}
+function exportVia(name, mime, b64){
+  if (saveViaApp(name, mime, b64, path => {
+    if (path) toast(tr('已保存到 ' + path, 'Saved to ' + path));
+    else toast(tr('保存失败，请重试', 'Save failed, please retry'));
+  })) return true;
+  return false;
+}
 function exportPNG(){
   if (is3D()) return window.View3D.shot();
   const clone = svg.cloneNode(true), W = 3200, H = Math.round(W*BOUNDS.h/BOUNDS.w);
@@ -1400,7 +1442,11 @@ function exportPNG(){
   img.onload = () => {
     const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
     cv.getContext('2d').drawImage(img, 0, 0, W, H);
-    cv.toBlob(b => download(tr('户型装修方案', 'floor-plan-design') + '.png', b));
+    const name = tr('户型装修方案', 'floor-plan-design') + '.png';
+    cv.toBlob(b => {
+      if (isApp()){ const fr = new FileReader(); fr.onload = () => exportVia(name, 'image/png', String(fr.result).split(',')[1]); fr.readAsDataURL(b); }
+      else download(name, b);
+    });
   };
   img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(clone));
 }
@@ -1481,17 +1527,162 @@ document.addEventListener('pointerdown', e => { const m = $('details.menu'); if 
 matchMedia('(max-width:1100px)').addEventListener('change', () => drawer(null));
 drawer(null);                                  // 恢复上次的面板收起状态
 $('#exportPng').onclick = exportPNG;
-$('#exportJson').onclick = () => download(tr('户型装修方案', 'floor-plan-design') + '.json', new Blob([JSON.stringify(state, null, 2)], {type:'application/json'}));
-$('#importJson').onclick = () => $('#fileIn').click();
+$('#exportJson').onclick = () => {
+  const name = tr('户型装修方案', 'floor-plan-design') + '.json';
+  const txt = JSON.stringify(state, null, 2);
+  if (!exportVia(name, 'application/json', strToB64(txt))) download(name, new Blob([txt], {type:'application/json'}));
+};
+$('#importJson').onclick = () => { $('#fileIn').accept = '.json,application/json'; $('#fileIn').click(); };
+$('#importImg').onclick = () => { $('#fileIn').accept = 'image/*'; $('#fileIn').click(); };
 $('#fileIn').onchange = e => {
   const file = e.target.files[0]; if (!file) return;
+  if (file.type && file.type.startsWith('image/')){ importPlanImage(file); e.target.value = ''; return; }
   file.text().then(txt => {
     try { const s = JSON.parse(txt); if (!Array.isArray(s.furniture)) throw 0; const b = snap(); state = fixState(s); ui.sel = null; commit(b); renderAll(); toast(tr('方案已导入', 'Plan imported')); }
     catch(err){ toast(tr('文件格式不正确', 'Invalid file format')); }
   });
   e.target.value = '';
 };
-$('#reset').onclick = () => { if (confirm(tr('恢复为默认设计方案？（可撤销）', 'Reset to the default design? (undoable)'))){ const b = snap(); state = defaultState(); ui.sel = null; commit(b); renderAll(); } };
+$('#reset').onclick = () => { if (confirm(tr('恢复为默认设计方案？（可撤销）', 'Reset to the default design? (undoable)'))){ localStorage.removeItem(STORE_PLAN); applyPlan(DEFAULT_PLAN); const b = snap(); state = defaultState(); ui.sel = null; commit(b); renderAll(); } };
+
+/* ======================= 导入图片 → 自动识别户型 ======================= */
+function importPlanImage(file){
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    URL.revokeObjectURL(url);
+    try {
+      const plan = analyzePlanImage(img);
+      if (!plan || !plan.walls.length || plan.rooms.length < 1) return toast(tr('未能识别出户型，请换一张白底深线、正交为主的清晰户型图', 'Could not detect the floor plan. Try a clean orthographic plan (white background, dark lines)'));
+      localStorage.setItem(STORE_PLAN, JSON.stringify(plan));
+      applyPlan(plan);
+      const rooms = {}; ROOMS.forEach(r => rooms[r.id] = {name:r.name, mat:r.mat});
+      state = {furniture:[], rooms, demolished:[], measures:[]};
+      ui.sel = null; save(); renderAll(); setTimeout(fitView, 30);
+      toast(tr('已识别 ' + plan.rooms.length + ' 个房间并生成模板，可继续摆家具', 'Detected ' + plan.rooms.length + ' rooms. You can now place furniture'));
+    } catch(e){ toast(tr('识别失败，请换一张轮廓清晰的户型图', 'Detection failed. Use a plan with clear outlines')); }
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); toast(tr('图片读取失败', 'Failed to read image')); };
+  img.src = url;
+}
+function analyzePlanImage(img){
+  const NAT = img.naturalWidth || img.width, NAH = img.naturalHeight || img.height;
+  if (!NAT || !NAH) throw 0;
+  const MAXW = 1400, sc = Math.min(1, MAXW / Math.max(NAT, NAH));
+  const CW = Math.max(8, Math.round(NAT*sc)), CH = Math.max(8, Math.round(NAH*sc));
+  const cv = document.createElement('canvas'); cv.width = CW; cv.height = CH;
+  const ctx = cv.getContext('2d', {willReadFrequently:true});
+  ctx.drawImage(img, 0, 0, CW, CH);
+  const data = ctx.getImageData(0, 0, CW, CH).data;
+  const gray = new Uint8Array(CW*CH), bin = new Uint8Array(CW*CH);
+  let sum = 0;
+  for (let i=0;i<CW*CH;i++){ const o=i*4; gray[i] = (data[o]*299 + data[o+1]*587 + data[o+2]*114) >> 10; sum += gray[i]; }
+  const thr = Math.min(150, (sum/(CW*CH)) * 0.72);
+  for (let i=0;i<CW*CH;i++) bin[i] = gray[i] < thr ? 1 : 0;
+  // 去噪：孤立暗点
+  for (let y=1;y<CH-1;y++) for (let x=1;x<CW-1;x++){
+    const i = y*CW+x; if (!bin[i]) continue;
+    if (!(bin[i-1]||bin[i+1]||bin[i-CW]||bin[i+CW])) bin[i]=0;
+  }
+  // 行 / 列投影找墙线候选：暗像素跨度要覆盖大半幅面
+  const hCand=[], vCand=[];
+  for (let y=0;y<CH;y++){
+    let first=-1,last=-1,run=0,best=0;
+    for (let x=0;x<CW;x++){ if (bin[y*CW+x]){ if(first<0)first=x; last=x; run++; } else { if(run>best)best=run; run=0; } }
+    if (run>best)best=run;
+    if (first>=0 && last-first > CW*0.5 && best > 24) hCand.push(y);
+  }
+  for (let x=0;x<CW;x++){
+    let first=-1,last=-1,run=0,best=0;
+    for (let y=0;y<CH;y++){ if (bin[y*CW+x]){ if(first<0)first=y; last=y; run++; } else { if(run>best)best=run; run=0; } }
+    if (run>best)best=run;
+    if (first>=0 && last-first > CH*0.5 && best > 24) vCand.push(x);
+  }
+  const cluster = arr => { const out=[]; if (!arr.length) return out; let s=arr[0], e=arr[0];
+    for (const v of arr.slice(1)){ if (v-e<=6){ e=v; } else { out.push(Math.round((s+e)/2)); s=v; e=v; } }
+    out.push(Math.round((s+e)/2)); return out; };
+  const ys = cluster(hCand), xs = cluster(vCand);
+  const m = ys.length, n = xs.length;
+  if (m < 3 || n < 3) throw 0;
+  // 墙段判定：图像上该小区段暗像素占比
+  const dark = (x0,x1,y0,y1) => { let c=0,t=0; const st=Math.max(1,Math.min(6, Math.floor(Math.min(x1-x0, y1-y0)/2)));
+    for (let y=y0;y<y1;y+=st) for (let x=x0;x<x1;x+=st){ t++; if (bin[y*CW+x]) c++; } return t ? c/t : 0; };
+  const segH = Array.from({length:m}, () => new Array(n-1).fill(false));
+  const segV = Array.from({length:n}, () => new Array(m-1).fill(false));
+  for (let i=0;i<m;i++) for (let j=0;j<n-1;j++) segH[i][j] = dark(xs[j], xs[j+1], ys[i]-2, ys[i]+3) > 0.45;
+  for (let i=0;i<n;i++) for (let j=0;j<m-1;j++) segV[i][j] = dark(xs[i]-2, xs[i]+3, ys[j], ys[j+1]) > 0.45;
+  // flood-fill 连通无墙的格子 → 房间
+  const rows = m-1, cols = n-1;
+  const seen = Array.from({length:rows}, () => new Array(cols).fill(false));
+  const hasW = (bi,bj,d) => d===0 ? segH[bi][bj] : d===1 ? segV[bj+1][bi] : d===2 ? segH[bi+1][bj] : segV[bj][bi];
+  const regions = [];
+  for (let bi=0;bi<rows;bi++) for (let bj=0;bj<cols;bj++){
+    if (seen[bi][bj]) continue;
+    const st=[[bi,bj]], cells=[]; seen[bi][bj]=true;
+    while (st.length){
+      const [i,j]=st.pop(); cells.push([i,j]);
+      const nb=[[i-1,j],[i,j+1],[i+1,j],[i,j-1]];
+      for (let d=0;d<4;d++){ const [ni,nj]=nb[d];
+        if (ni<0||nj<0||ni>=rows||nj>=cols||seen[ni][nj]) continue;
+        if (hasW(i,j,d)) continue;
+        seen[ni][nj]=true; st.push([ni,nj]);
+      }
+    }
+    regions.push(cells);
+  }
+  const totalCells = rows*cols;
+  const keep = regions.filter(cs => cs.length >= Math.max(2, Math.round(totalCells*0.02)));
+  if (!keep.length) throw 0;
+  // 区域 → 正交轮廓（单元格边界 walk）
+  const polyOf = cells => {
+    const set = new Set(cells.map(c => c[0]*cols + c[1]));
+    const bseg=[];
+    for (const [i,j] of cells){
+      if (!set.has((i-1)*cols+j)) bseg.push([[xs[j],ys[i]],[xs[j+1],ys[i]]]);
+      if (!set.has((i+1)*cols+j)) bseg.push([[xs[j],ys[i+1]],[xs[j+1],ys[i+1]]]);
+      if (!set.has(i*cols+j-1)) bseg.push([[xs[j],ys[i]],[xs[j],ys[i+1]]]);
+      if (!set.has(i*cols+j+1)) bseg.push([[xs[j+1],ys[i]],[xs[j+1],ys[i+1]]]);
+    }
+    if (!bseg.length) return null;
+    const adj = new Map(), key = p => p[0]+'_'+p[1];
+    const addE = (a,b) => { const ka=key(a), kb=key(b); if(!adj.has(ka))adj.set(ka,[]); if(!adj.has(kb))adj.set(kb,[]); adj.get(ka).push(b); adj.get(kb).push(a); };
+    bseg.forEach(s => addE(s[0], s[1]));
+    const start = bseg[0][0].slice();
+    const poly=[start.slice()]; let cur=start.slice(), prev=null;
+    for (let g=0; g<=bseg.length*2+4; g++){
+      const opts = (adj.get(key(cur))||[]).filter(p => !prev || !(p[0]===prev[0] && p[1]===prev[1]));
+      if (!opts.length) break;
+      const nxt = opts[0];
+      if (nxt[0]===start[0] && nxt[1]===start[1] && poly.length>2) break;
+      poly.push(nxt.slice()); prev=cur; cur=nxt;
+    }
+    if (poly.length < 4) return null;
+    // 去尾部与起点重合的顶点
+    while (poly.length>3 && poly[poly.length-1][0]===poly[0][0] && poly[poly.length-1][1]===poly[0][1]) poly.pop();
+    return poly;
+  };
+  // 组装：墙 + 房间（像素 → mm，长边近似 14 米）
+  const mmPP = 14000 / Math.max(CW, CH);
+  const P = v => Math.round(v * mmPP);
+  const walls=[];
+  for (let i=0;i<m;i++) for (let j=0;j<n-1;j++) if (segH[i][j]){
+    const ext = (i===0||i===m-1||j===0||j===n-2);
+    walls.push([P(xs[j]), P(ys[i]), P(xs[j+1]), P(ys[i]), ext ? 'e' : 'n']);
+  }
+  for (let i=0;i<n;i++) for (let j=0;j<m-1;j++) if (segV[i][j]){
+    const ext = (i===0||i===n-1||j===0||j===m-2);
+    walls.push([P(xs[i]), P(ys[j]), P(xs[i]), P(ys[j+1]), ext ? 'e' : 'n']);
+  }
+  const areas = keep.map(cs => cs.length), maxIdx = areas.indexOf(Math.max(...areas));
+  const rooms = keep.map((cs,k) => {
+    const poly = polyOf(cs);
+    if (!poly) return null;
+    let sx=0, sy=0; cs.forEach(c => { sx += xs[c[1]] + xs[c[1]+1]; sy += ys[c[0]] + ys[c[0]+1]; });
+    const cx = sx/(cs.length*2), cy = sy/(cs.length*2);
+    return {id:'imp'+(k+1), name:(k===maxIdx?'客厅':'房间'+(k+1)), poly:poly.map(p => [P(p[0]), P(p[1])]), mat:'wood', at:[P(cx), P(cy)]};
+  }).filter(Boolean);
+  return {walls, wins:[], doors:[], slides:[], rooms};
+}
 // 横竖屏切换、表头换行等都会改变画布尺寸；尺寸从 0 恢复（如首次布局）时重新适应窗口
 // 其余尺寸变化（收起 / 展开面板等）保持画面中心不动
 let lastW = 0, lastH = 0;

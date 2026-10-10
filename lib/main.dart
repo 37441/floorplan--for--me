@@ -5,6 +5,14 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  // 浅色主题：白色状态栏 + 深色图标（避免 Android 默认深色状态栏与浅色界面割裂）
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.white,
+    statusBarIconBrightness: Brightness.dark,
+    statusBarBrightness: Brightness.light,
+    systemNavigationBarColor: Colors.white,
+    systemNavigationBarIconBrightness: Brightness.dark,
+  ));
   runApp(const FloorPlanApp());
 }
 
@@ -96,6 +104,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               : const [DeviceOrientation.portraitUp],
         );
         return null;
+      },
+    );
+    // 网页导出文件分块传到此，交由原生 MediaStore 写入系统下载目录。
+    const saveChannel = MethodChannel('app/save_file');
+    controller.addJavaScriptHandler(
+      handlerName: 'saveChunk',
+      callback: (args) async {
+        if (args.isEmpty) return null;
+        try {
+          final map = Map<String, dynamic>.from(args.first as Map);
+          return await saveChannel
+              .invokeMethod<Map<dynamic, dynamic>>('chunk', map);
+        } catch (_) {
+          return null;
+        }
       },
     );
     await _injectStatusBarPadding();
