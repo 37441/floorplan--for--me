@@ -60,6 +60,13 @@ flutter:
 
   assets:
     - assets/
+    # Flutter 的 assets 目录声明不递归子目录，three.js 各模块需显式列出。
+    - assets/three/three.module.js
+    - assets/three/addons/controls/OrbitControls.js
+    - assets/three/addons/controls/PointerLockControls.js
+    - assets/three/addons/geometries/RoundedBoxGeometry.js
+    - assets/three/addons/environments/RoomEnvironment.js
+    - assets/three/addons/renderers/CSS2DRenderer.js
 
   # To add assets to your application, add an assets section, like this:
   # assets:
